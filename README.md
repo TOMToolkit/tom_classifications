@@ -23,6 +23,3 @@ The documentation and a more detailed readme will come later.
 `./manage.py migrate`
 
 4. Copy the data files from "tom_classifications/data" to the data/ directory of your TOM.
-
-5. Copy the target_detail.py into your TOM:
-`cp tom_classifications/tom_classifications/templates/tom_targets/target_detail.html  [PATH]/mytom/templates/tom_targets/target_detail.html`
