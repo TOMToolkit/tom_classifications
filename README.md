@@ -21,5 +21,3 @@ The documentation and a more detailed readme will come later.
 
 3. Migrate your TOM's database to install the new database tables:
 `./manage.py migrate`
-
-4. Copy the data files from "tom_classifications/data" to the data/ directory of your TOM.
