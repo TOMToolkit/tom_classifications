@@ -1,11 +1,28 @@
 import json
-from django import template
-from plotly import offline
-from plotly import graph_objs as go
-from django.conf import settings
+import logging
 from os import path
 
+from django import template
+from django.conf import settings
+
+from tom_classifications import __version__
+
+from plotly import offline
+from plotly import graph_objs as go
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 register = template.Library()
+
+
+@register.inclusion_tag('tom_classifications/partials/classification_tab.html')
+def get_context(request_context):
+    context = {
+        'version': __version__
+    }
+    return context
+
 
 @register.inclusion_tag('tom_classifications/partials/classif_sun.html')
 def classif_sun(target, width=700, height=700, background=None, label_color=None, grid=True):
