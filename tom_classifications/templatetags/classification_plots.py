@@ -1,6 +1,6 @@
 import json
 import logging
-from os import path
+import os
 
 from django import template
 from django.conf import settings
@@ -11,10 +11,9 @@ from plotly import offline
 from plotly import graph_objs as go
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 register = template.Library()
-
 
 @register.inclusion_tag('tom_classifications/partials/classification_tab.html')
 def get_context(request_context):
@@ -22,6 +21,19 @@ def get_context(request_context):
         'version': __version__
     }
     return context
+
+
+def get_data_file_path(filename):
+    """Get the absolute path to a data file within the tom_classifications package.
+
+    This should preclude any app installation step that moves files by hand.
+    """
+    current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    absolute_path = os.path.join(current_dir, 'data', filename)
+
+    logger.debug(f'path to {filename}: {absolute_path}')
+
+    return absolute_path
 
 
 @register.inclusion_tag('tom_classifications/partials/classif_sun.html')
@@ -35,8 +47,10 @@ def classif_sun(target, width=700, height=700, background=None, label_color=None
     lasair_tcs = tcs.filter(source='Lasair')
     fink_tcs = tcs.filter(source='Fink')
 
-    with open(path.join(settings.MEDIA_ROOT,'broker_codes.txt')) as json_file:#this loads the parentage dictionary that I made
+    # this loads the parentage dictionary that I made
+    with open(get_data_file_path('broker_codes.txt')) as json_file:
         big_codes_dict = json.load(json_file)
+
     las_codes = big_codes_dict['las_codes']
     alst_codes = big_codes_dict['alerce_stamp_codes']
     allc_codes = big_codes_dict['alerce_lc_codes']
@@ -57,7 +71,7 @@ def classif_sun(target, width=700, height=700, background=None, label_color=None
         codes.append( (allc_codes.get(tc.classification), 'Alerce LC', tc.probability))
 
     #deals with fink
-    with open(path.join(settings.MEDIA_ROOT,'SIMBAD_otypes_labels.txt')) as f:
+    with open(get_data_file_path('SIMBAD_otypes_labels.txt')) as f:
         for line in f:
             [_, code, old, new] = line.split('|')
             fink_codes[old.strip()] = code.strip()
@@ -68,7 +82,7 @@ def classif_sun(target, width=700, height=700, background=None, label_color=None
             candidate = True
         codes.append( (fink_codes[tc.classification], 'Fink', tc.probability))
 
-    with open(path.join(settings.MEDIA_ROOT,'variability.txt')) as json_file:
+    with open(get_data_file_path('variability.txt')) as json_file:
         parents_dict = json.load(json_file)
 
     labels = ['~Alert']
@@ -138,7 +152,7 @@ def classif_scatter(target, width=700, height=700, background=None, label_color=
     lasair_tcs = tcs.filter(source='Lasair')
     fink_tcs = tcs.filter(source='Fink')
 
-    with open(path.join(settings.MEDIA_ROOT,'variability.txt')) as json_file:
+    with open(get_data_file_path('variability.txt')) as json_file:
         parents_dict = json.load(json_file)
 
     fig = go.Figure(go.Barpolar(
@@ -165,7 +179,8 @@ def classif_scatter(target, width=700, height=700, background=None, label_color=
     ))
     objs = ['SNIa', 'SNIbc', 'SNII', 'SLSN', 'SN*', 'QSO', 'AGN', 'G*', 'LP*', 'Ce*', 'RR*', 'dS*', 'Pu*', 'EB*', 'CV*', '**',  'Y*O', 'Er*', 'Ro*', 'V*', 'ast', 'grv', 'Other', '~Alert']
 
-    with open(path.join(settings.MEDIA_ROOT,'broker_codes.txt')) as json_file:#this loads the parentage dictionary that I made
+    # this loads the parentage dictionary that I made
+    with open(get_data_file_path('broker_codes.txt')) as json_file:
         big_codes_dict = json.load(json_file)
     las_codes = big_codes_dict['las_codes']
     alst_codes = big_codes_dict['alerce_stamp_codes']
@@ -240,7 +255,7 @@ def classif_scatter(target, width=700, height=700, background=None, label_color=
         fill = 'toself'))
 
     #deals with fink,
-    with open(path.join(settings.MEDIA_ROOT,'SIMBAD_otypes_labels.txt')) as f:
+    with open(get_data_file_path('SIMBAD_otypes_labels.txt')) as f:
         for line in f:
             [_, code, old, new] = line.split('|')
             fink_codes[old.strip()] = code.strip()
