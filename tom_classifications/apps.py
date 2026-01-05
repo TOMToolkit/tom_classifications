@@ -14,10 +14,11 @@ class TomClassificationsConfig(AppConfig):
         The `context` key should point to the dot separated string path to the templatetag
         that will return a dictionary containing new context for the accompanying partial.
         The `label` key will represent the label string to put in the tab and use as a tab reference id.
-        This partial will be displayed within the tab on the target detail page.
 
+        This partial will be displayed within the tab on the target detail page.
         """
-        return [{'partial': f'{self.name}/partials/classification_tab.html',
-                 'label': 'Classification',
-                 # 'context': f'{self.name}.templatetags.classification_plots'
-                }]
+        return [{
+            'partial': f'{self.name}/partials/classification_tab.html',
+            'label': 'Classification',
+            'context': f'{self.name}.templatetags.classification_plots.get_context'
+        }]
